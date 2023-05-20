@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minesweeper/ui/theme/colors.dart';
+import 'package:minesweeper/utils/game_helper.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -9,6 +10,14 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  MineSweeperGame game = MineSweeperGame();
+
+  @override
+  void initState() {
+    super.initState();
+    game.generateMap();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,7 +104,82 @@ class _MainScreenState extends State<MainScreen> {
             height: 500.0,
             width: double.infinity,
             padding: const EdgeInsets.all(20.0),
-          )
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: MineSweeperGame.row,
+                crossAxisSpacing: 4.0,
+                mainAxisSpacing: 4.0,
+              ),
+              itemCount: MineSweeperGame.cells,
+              itemBuilder: (BuildContext context, index) {
+                Color cellColor = game.gameMap[index].reveal
+                    ? AppColor.clickedColor
+                    : AppColor.lightPrimaryColor;
+                return GestureDetector(
+                  onTap: game.gameOver
+                      ? null
+                      : () {
+                          setState(() {
+                            game.getClickedCell(game.gameMap[index]);
+                          });
+                        },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: cellColor,
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                    child: Center(
+                      child: Text(
+                        game.gameMap[index].reveal
+                            ? "${game.gameMap[index].content}"
+                            : "",
+                        style: TextStyle(
+                            color: game.gameMap[index].reveal
+                                ? game.gameMap[index].content == 'X'
+                                    ? Colors.red
+                                    : AppColor.letterColors[
+                                        game.gameMap[index].content]
+                                : Colors.transparent,
+                            fontSize: 20.0),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Text(
+            game.gameOver ? 'Проиграл' : '',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 32.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20.0),
+          RawMaterialButton(
+
+            onPressed: () {
+              setState(() {
+                game.resetGame();
+                game.gameOver = false;
+              });
+            },
+            fillColor: AppColor.lightPrimaryColor,
+            elevation: 0.0,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 64.0, vertical: 24.0),
+            shape: const StadiumBorder(),
+            child: const Text(
+              'играть заново',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 32.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20.0),
         ],
       ),
     );
