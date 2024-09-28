@@ -1,6 +1,6 @@
 # minesweeper
 
-Simple minesweeper game for nfactorial incubator
+Simple minesweeper game writen in DART/FLUTTER
 
 ## Getting Started
 
